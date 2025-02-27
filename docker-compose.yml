@@ -1,0 +1,57 @@
+services:
+    # PHP Application Service
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: roomfull-app
+        restart: unless-stopped
+        working_dir: /var/www/
+        volumes:
+            - ./:/var/www
+        networks:
+            - roomfull-network
+        depends_on:
+            - db
+
+    # Nginx Service
+    nginx:
+        image: nginx:alpine
+        container_name: roomfull-nginx
+        restart: unless-stopped
+        ports:
+            - "80:80"
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx/conf.d:/etc/nginx/conf.d
+        networks:
+            - roomfull-network
+        depends_on:
+            - app
+
+    # MySQL Service
+    db:
+        image: mysql:8.0
+        container_name: roomfull-db
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_USER: ${DB_USERNAME}
+        volumes:
+            - dbdata:/var/lib/mysql
+        ports:
+            - "3306:3306"
+        networks:
+            - roomfull-network
+
+# Volumes
+volumes:
+    dbdata:
+        driver: local
+
+# Networks
+networks:
+    roomfull-network:
+        driver: bridge
