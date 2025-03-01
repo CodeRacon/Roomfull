@@ -14,16 +14,16 @@ return new class extends Migration
     Schema::create('bookings', function (Blueprint $table) {
       $table->id();
 
-      // Fremdschlüssel
-      $table->foreignId('room_id')->constrained(); // Verknüpft mit rooms.id
-      $table->foreignId('user_id')->constrained(); // Verknüpft mit users.id
+      // Foreign Key
+      $table->foreignId('room_id')->constrained(); // connected with rooms.id
+      $table->foreignId('user_id')->constrained(); // connected with users.id
 
-      // Buchungsdetails
+      // Booking-Deatails
       $table->dateTime('start_time');
       $table->dateTime('end_time');
       $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');
       $table->decimal('price', 8, 2);
-      $table->text('notes')->nullable(); // Nullable bedeutet, dass dieser Wert NULL sein darf
+      $table->text('notes')->nullable(); // nullable means, value can be Null
 
       $table->timestamps();
     });

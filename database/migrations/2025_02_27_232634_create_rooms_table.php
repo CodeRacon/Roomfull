@@ -12,16 +12,16 @@ return new class extends Migration
   public function up(): void
   {
     Schema::create('rooms', function (Blueprint $table) {
-      $table->id(); // Das ist bereits da
+      $table->id(); // allready there
 
-      $table->string('name');  // Für Text wie "Meeting Room A"
-      $table->enum('type', ['meeting', 'office', 'booth', 'open_world']);  // Für vorgegebene Auswahlmöglichkeiten
-      $table->integer('capacity');  // Für ganze Zahlen wie 8, 10, 16
-      $table->integer('min_duration')->default(60);  // Mit Standardwert 60 Minuten
-      $table->decimal('price_per_hour', 8, 2);  // Für Preise mit 2 Dezimalstellen
-      $table->boolean('is_active')->default(true);  // Für ja/nein-Werte
+      $table->string('name');  // for text like "Meeting Room A"
+      $table->enum('type', ['meeting', 'office', 'booth', 'open_world']);  // for pre-defined selection to choose from
+      $table->integer('capacity');  // for integers like 8, 10, 16
+      $table->integer('min_duration')->default(60);  // with a default of 60 minutes
+      $table->decimal('price_per_hour', 8, 2);  // for rates with 2 decimals
+      $table->boolean('is_active')->default(true);  // for boolean
 
-      $table->timestamps(); // Das ist bereits da
+      $table->timestamps(); // bereits vorgegeben
     });
   }
 
