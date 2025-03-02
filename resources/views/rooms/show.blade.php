@@ -18,7 +18,20 @@
       </div>
       <div class="col-md-4">
         <strong>Price:</strong> ${{ $room->price_per_hour }}/hour
+
+        @if($room->price_per_day)
+        <br><strong>Day rate:</strong> ${{ $room->price_per_day }}/day
+        @endif
+
+        @if($room->price_per_week)
+        <br><strong>Week rate:</strong> ${{ $room->price_per_week }}/week
+        @endif
+
+        @if($room->discount_percentage)
+        <br><strong>Discount:</strong> {{ $room->discount_percentage }}%
+        @endif
       </div>
+
       <div class="col-md-4">
         <strong>Minimum Duration:</strong> {{ $room->min_duration }} minutes
       </div>

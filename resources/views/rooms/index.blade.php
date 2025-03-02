@@ -19,9 +19,14 @@
         <h6 class="card-subtitle mb-2 text-muted">Type: {{ ucfirst($room->type) }}</h6>
         <p class="card-text">
           Capacity: {{ $room->capacity }} people<br>
-          Price: ${{ $room->price_per_hour }}/hour<br>
+          Price: ${{ $room->price_per_hour }}/hour
+          @if($room->price_per_day || $room->price_per_week || $room->discount_percentage)
+          <span class="badge bg-info">Special rates available</span>
+          @endif
+          <br>
           Minimum duration: {{ $room->min_duration }} minutes
         </p>
+
 
       </div>
     </div>
