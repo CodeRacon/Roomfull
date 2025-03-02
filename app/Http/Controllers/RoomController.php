@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Room;
 use Illuminate\Http\Request;
+use App\Services\BookingService;
+
 
 class RoomController extends Controller
 {
@@ -25,26 +27,49 @@ class RoomController extends Controller
     return view('rooms.create');
   }
 
-  /**
-   * Store a newly created resource in storage.
-   */
-  public function store(Request $request)
+  protected function roomValidationRules()
   {
-    // validate entries
-    $validated = $request->validate([
+    return [
       'name' => 'required|string|max:255',
       'type' => 'required|in:meeting,office,booth,open_world',
       'capacity' => 'required|integer|min:1',
       'min_duration' => 'required|integer|min:15',
       'price_per_hour' => 'required|numeric|min:0',
+      'price_per_day' => 'nullable|numeric|min:0',
+      'price_per_week' => 'nullable|numeric|min:0',
+      'discount_percentage' => 'nullable|numeric|min:0|max:100',
       'is_active' => 'boolean',
-    ]);
+    ];
+  }
 
-    // create a new room
+  /**
+   * Store a newly created resource in storage.
+   */
+  public function store(Request $request)
+  {
+    // validation with rules from helper-method
+    $validated = $request->validate($this->roomValidationRules());
+
+    // create Room
     $room = Room::create($validated);
 
     return redirect()->route('rooms.show', $room)
       ->with('success', 'Room created successfully!');
+  }
+
+  /**
+   * Update the specified resource in storage.
+   */
+  public function update(Request $request, Room $room)
+  {
+    // re-use same validation-rules
+    $validated = $request->validate($this->roomValidationRules());
+
+    // update Room
+    $room->update($validated);
+
+    return redirect()->route('rooms.show', $room)
+      ->with('success', 'Room updated successfully!');
   }
 
   /**
@@ -63,27 +88,6 @@ class RoomController extends Controller
     return view('rooms.edit', compact('room'));
   }
 
-  /**
-   * Update the specified resource in storage.
-   */
-  public function update(Request $request, Room $room)
-  {
-    // validate entries
-    $validated = $request->validate([
-      'name' => 'required|string|max:255',
-      'type' => 'required|in:meeting,office,booth,open_world',
-      'capacity' => 'required|integer|min:1',
-      'min_duration' => 'required|integer|min:15',
-      'price_per_hour' => 'required|numeric|min:0',
-      'is_active' => 'boolean',
-    ]);
-
-    // update room
-    $room->update($validated);
-
-    return redirect()->route('rooms.show', $room)
-      ->with('success', 'Room updated successfully!');
-  }
 
   /**
    * Remove the specified resource from storage.
@@ -94,5 +98,39 @@ class RoomController extends Controller
 
     return redirect()->route('rooms.index')
       ->with('success', 'Room deleted successfully!');
+  }
+
+
+  /**
+   * check room availability
+   */
+  public function checkAvailability(Request $request, BookingService $bookingService)
+  {
+    $validated = $request->validate([
+      'room_id' => 'required|exists:rooms,id',
+      'start_time' => 'required|date',
+      'end_time' => 'required|date|after:start_time',
+    ]);
+
+    $room = Room::findOrFail($validated['room_id']);
+    $isAvailable = $bookingService->isRoomAvailable(
+      $room,
+      $validated['start_time'],
+      $validated['end_time']
+    );
+
+    $price = null;
+    if ($isAvailable) {
+      $price = $bookingService->calculatePrice(
+        $room,
+        $validated['start_time'],
+        $validated['end_time']
+      );
+    }
+
+    return response()->json([
+      'available' => $isAvailable,
+      'price' => $price,
+    ]);
   }
 }
