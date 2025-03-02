@@ -20,8 +20,12 @@ class Room extends Model
     'capacity',
     'min_duration',
     'price_per_hour',
+    'price_per_day',
+    'price_per_week',
+    'discount_percentage',
     'is_active',
   ];
+
 
   /**
    * Get the bookings for the room.
