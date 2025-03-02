@@ -21,7 +21,7 @@ return new class extends Migration
       $table->decimal('price_per_hour', 8, 2);  // for rates with 2 decimals
       $table->boolean('is_active')->default(true);  // for boolean
 
-      $table->timestamps(); // bereits vorgegeben
+      $table->timestamps(); // allready there
     });
   }
 
